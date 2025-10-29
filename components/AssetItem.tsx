@@ -1,17 +1,22 @@
 // components/AssetItem.tsx
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Asset } from "../lib/types";
 
 export default function AssetItem({ asset }: { asset: Asset }) {
+  const router = useRouter();
+
   return (
-    <View style={styles.card}>
-      <Text style={styles.name}>{asset.name || "Brak nazwy"}</Text>
-      <Text style={styles.tag}>Tag: {asset.asset_tag || "brak"}</Text>
-      <Text style={styles.status}>
-        Status: {asset.status_label?.name || "nieznany"}
-      </Text>
-    </View>
+      <TouchableOpacity onPress={() => router.push(`/asset/${asset.id}`)}>
+        <View style={styles.card}>
+          <Text style={styles.name}>{asset.name || "Brak nazwy"}</Text>
+          <Text style={styles.tag}>Tag: {asset.asset_tag || "brak"}</Text>
+          <Text style={styles.status}>
+            Status: {asset.status_label?.name || "nieznany"}
+          </Text>
+        </View>
+      </TouchableOpacity>
   );
 }
 

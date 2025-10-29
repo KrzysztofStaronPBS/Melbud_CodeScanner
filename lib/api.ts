@@ -1,7 +1,7 @@
 import axios from "axios";
 import { AssetResponse } from "./types";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_BASE_URL,
   headers: {
     Authorization: `Bearer ${process.env.EXPO_PUBLIC_API_TOKEN}`,
