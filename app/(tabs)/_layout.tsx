@@ -5,7 +5,9 @@ import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Tabs, usePathname, useRouter, useSegments } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,7 +19,12 @@ export default function TabLayout() {
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <View style={styles.header}>
+          <Ionicons name="cube-outline" size={24} color="#00897B" />
+          <Text style={styles.headerText}>Melbud CodeScanner</Text>
+      </View>
+
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
@@ -72,7 +79,7 @@ export default function TabLayout() {
           <Ionicons name="qr-code-outline" size={42} color="#fff" />
         </TouchableOpacity>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -88,5 +95,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,
+  },
+
+header: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: 10,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingVertical: 10,
+  backgroundColor: "#fff",
+  elevation: 2,
+},
+
+  headerText: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginLeft: 8,
+    color: "#00897B",
   },
 });

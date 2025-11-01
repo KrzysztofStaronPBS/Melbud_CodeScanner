@@ -1,4 +1,3 @@
-// components/AssetItem.tsx
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -10,8 +9,7 @@ export default function AssetItem({ asset }: { asset: Asset }) {
   return (
       <TouchableOpacity onPress={() => router.push(`/asset/${asset.id}`)}>
         <View style={styles.card}>
-          <Text style={styles.name}>{asset.name || "Brak nazwy"}</Text>
-          <Text style={styles.tag}>Tag: {asset.asset_tag || "brak"}</Text>
+          <Text style={styles.name}>{asset.category?.name ?? "Brak kategorii"} {asset.name || "Brak nazwy"}</Text>
           <Text style={styles.status}>
             Status: {asset.status_label?.name || "nieznany"}
           </Text>

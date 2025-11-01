@@ -1,4 +1,3 @@
-// app/index.tsx
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import AssetItem from "../components/AssetItem";
@@ -63,9 +62,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f5f5f5" },
   search: {
     backgroundColor: "#fff",
-    padding: 10,
-    margin: 12,
-    borderRadius: 6,
     borderWidth: 1,
     borderColor: "#ccc",
   },

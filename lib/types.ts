@@ -30,6 +30,7 @@ export interface DateField {
 export interface Asset {
   id: number;
   name?: string;
+  category?: Category;
   asset_tag?: string;
   status_label?: StatusLabel;
 }
@@ -37,7 +38,6 @@ export interface Asset {
 export interface AssetDetails extends Asset {
   company?: Company;
   manufacturer?: Manufacturer;
-  category?: Category;
   model?: Model;
   model_number?: string;
   notes?: string;
