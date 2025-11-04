@@ -50,7 +50,6 @@ export default function HomeScreen() {
     );
   }, [query, assets]);
 
-  // 🗑️ Usuwanie wpisu
   const handleDelete = (id: number, name: string) => {
     Alert.alert(
       "Potwierdzenie",
@@ -74,7 +73,6 @@ export default function HomeScreen() {
     );
   };
 
-  // 🖊️ Edycja wpisu
   const handleEdit = (id: number) => {
     router.push({ pathname: "/asset/[id]/edit", params: { id } });
   };

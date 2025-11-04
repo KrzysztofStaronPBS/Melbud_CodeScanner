@@ -1,8 +1,8 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { api } from "../lib/api"; // dostosuj do swojej struktury
+import { Button, StyleSheet, Text, View } from "react-native";
+import { api } from "../lib/api";
 
 export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -10,20 +10,18 @@ export default function ScanScreen() {
   const lastScanTime = useRef(0);
 
   if (!permission) return <View />;
-  if (!permission.granted) {
-    return (
-      <View style={styles.center}>
-        <Text>Brak dostępu do kamery</Text>
-        <Text style={{ marginTop: 10 }} onPress={requestPermission}>
-          👉 Zezwól
-        </Text>
-      </View>
-    );
+    if (!permission.granted) {
+      return (
+        <View style={styles.center}>
+          <Text>Brak dostępu do kamery</Text>
+          <Button onPress={requestPermission} title="Zezwól" />
+        </View>
+      );
   }
 
   const handleScan = async (data: string) => {
     const now = Date.now();
-    if (now - lastScanTime.current < 2000) return; // debounce 2s
+    if (now - lastScanTime.current < 2000) return;
     lastScanTime.current = now;
 
     const id = data.split("/").pop()?.trim() ?? "";
@@ -33,7 +31,6 @@ export default function ScanScreen() {
     }
 
     try {
-      // sprawdzamy, czy istnieje taki przedmiot
       await api.get(`hardware/${id}`);
       router.push({ pathname: "/asset/[id]", params: { id } });
     } catch (err: any) {
