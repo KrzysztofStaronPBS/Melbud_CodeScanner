@@ -1,4 +1,3 @@
-// app/(tabs)/index.tsx
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
@@ -8,7 +7,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import AssetItem from "../../components/AssetItem";
 import { getAssets } from "../../lib/api";
@@ -48,7 +46,7 @@ export default function HomeScreen() {
   }, [query, assets]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <View style={styles.safeArea}>
       <StatusBar style="dark" backgroundColor="#f5f5f5" />
       <View style={styles.container}>
         <TextInput
@@ -64,10 +62,11 @@ export default function HomeScreen() {
             data={filtered}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <AssetItem asset={item} />}
+            contentContainerStyle={{ paddingBottom: 16 }}
           />
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

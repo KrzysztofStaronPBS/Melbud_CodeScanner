@@ -1,3 +1,4 @@
+import AppHeader from "@/components/AppHeader";
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -5,34 +6,29 @@ import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Tabs, usePathname, useRouter, useSegments } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const segments = useSegments();
-
   const pathname = usePathname();
   const isScanScreen = pathname === "/scan";
-
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <View style={styles.header}>
-          <Ionicons name="cube-outline" size={24} color="#00897B" />
-          <Text style={styles.headerText}>Melbud CodeScanner</Text>
-      </View>
-
+    <>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-          headerShown: false,
+          header: () => <AppHeader />,
+          headerStyle: { height: 40 },
+          headerTransparent: false,
           tabBarButton: HapticTab,
           tabBarStyle: {
-            height: 80,
-            paddingBottom: 4,
+            height: 80 + insets.bottom,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 4,
             paddingTop: 4,
           },
           tabBarLabelStyle: {
@@ -73,20 +69,21 @@ export default function TabLayout() {
 
       {!isScanScreen && (
         <TouchableOpacity
-          style={styles.fab}
+          style={[styles.fab,
+           { bottom: (80 + insets.bottom) + 16 }
+          ]}
           onPress={() => router.push("/scan")}
         >
           <Ionicons name="qr-code-outline" size={42} color="#fff" />
         </TouchableOpacity>
       )}
-    </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    bottom: 100,
     right: 24,
     backgroundColor: "#00897B",
     borderRadius: 42,
