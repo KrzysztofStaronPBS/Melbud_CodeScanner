@@ -13,3 +13,8 @@ export async function getAssets(): Promise<AssetResponse> {
   const res = await api.get<AssetResponse>("hardware");
   return res.data;
 }
+
+export async function deleteAsset(id: number) {
+  const res = await api.delete(`/hardware/${id}`);
+  return res.data;
+}
