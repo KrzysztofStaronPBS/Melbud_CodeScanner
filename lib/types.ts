@@ -3,22 +3,27 @@ export interface StatusLabel {
 }
 
 export interface StatusLabel {
+  id?: number;
   name?: string;
 }
 
 export interface Company {
+  id?: number;
   name?: string;
 }
 
 export interface Manufacturer {
+  id?: number;
   name?: string;
 }
 
 export interface Category {
+  id?: number;
   name?: string;
 }
 
 export interface Model {
+  id?: number;
   name?: string;
 }
 
@@ -50,3 +55,15 @@ export interface AssetResponse {
   total: number;
   rows: Asset[];
 }
+
+export type AssetUpdatePayload = {
+  name?: string;
+  asset_tag?: string;
+  model_number?: string;
+  notes?: string;
+  mac_address?: string;
+  company_id?: number | null;
+  model_id?: number | null;
+  status_id?: number | null;
+  location_id?: number | null;
+};
