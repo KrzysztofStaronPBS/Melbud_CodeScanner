@@ -1,6 +1,6 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { api } from "../lib/api";
 
@@ -8,6 +8,13 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const router = useRouter();
   const lastScanTime = useRef(0);
+  const navigation = useNavigation();
+  
+    useEffect(() => {
+      navigation.setOptions({
+        title: "Zeskanuj kod QR",
+    });
+    }, [navigation]);
 
   if (!permission) return <View />;
     if (!permission.granted) {
@@ -47,7 +54,6 @@ export default function ScanScreen() {
         onBarcodeScanned={({ data }) => handleScan(data)}
       />
 
-      {/* 🎯 Celownik */}
       <View style={styles.targetBox}>
         <View style={styles.cornerTopLeft} />
         <View style={styles.cornerTopRight} />
@@ -55,10 +61,6 @@ export default function ScanScreen() {
         <View style={styles.cornerBottomRight} />
       </View>
 
-      {/* Tekst pomocniczy */}
-      <View style={styles.textOverlay}>
-        <Text style={styles.text}>Zeskanuj kod QR</Text>
-      </View>
     </View>
   );
 }

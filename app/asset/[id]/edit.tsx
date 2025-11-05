@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,6 +32,7 @@ export default function EditAssetScreen() {
   const [modelId, setModelId] = useState<number | null>(null);
   const [statusId, setStatusId] = useState<number | null>(null);
 
+  const navigation = useNavigation();
 
   useEffect(() => {
     async function load() {
@@ -55,6 +56,9 @@ export default function EditAssetScreen() {
         setModelId(data.model?.id ?? null);
         setStatusId(data.status_label?.id ?? null);
 
+        navigation.setOptions({
+          title: `Edytuj ${data.name ?? data.asset_tag ?? "sprzęt"}`,
+        });
       } catch (err: any) {
         Alert.alert("Błąd", "Nie udało się pobrać danych sprzętu");
       }
