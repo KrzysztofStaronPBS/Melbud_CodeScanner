@@ -1,5 +1,6 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -22,9 +23,11 @@ export default function HomeScreen() {
   const [query, setQuery] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     loadAssets();
-  }, []);
+  }, [])
+);
 
   async function loadAssets() {
     setLoading(true);
@@ -92,6 +95,8 @@ export default function HomeScreen() {
         ) : (
           <FlatList
             data={filtered}
+            refreshing={loading}
+            onRefresh={loadAssets}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View style={styles.itemRow}>
