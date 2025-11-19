@@ -49,6 +49,7 @@ export interface AssetDetails extends Asset {
   mac_address?: string;
   created_at?: DateField;
   updated_at?: DateField;
+  image?: string;
 }
 
 export interface AssetResponse {

@@ -1,10 +1,12 @@
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAssetById, getCompanies, getLocations, getModels, getStatuses, updateAsset } from "../../../lib/api";
+import { deleteAssetImage, getAssetById, getCompanies, getLocations, getModels, getStatuses, updateAsset, uploadAssetImage } from "../../../lib/api";
 import { AssetDetails } from "../../../lib/types";
+
+import * as ImagePicker from "expo-image-picker";
 
 export default function EditAssetScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -33,6 +35,59 @@ export default function EditAssetScreen() {
   const [statusId, setStatusId] = useState<number | null>(null);
 
   const navigation = useNavigation();
+
+  const [uploading, setUploading] = useState(false);
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Brak uprawnień", "Aplikacja potrzebuje dostępu do galerii.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      quality: 0.7,
+    });
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const uri = result.assets[0].uri;
+    try {
+      setUploading(true);
+      if (!asset) return;
+      await uploadAssetImage(Number(asset.id), uri);
+      const updated = await getAssetById(Number(asset.id));
+      setAsset(updated);
+    } catch (err) {
+      Alert.alert("Błąd", "Nie udało się wgrać zdjęcia.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = async () => {
+    Alert.alert("Usuń zdjęcie", "Czy na pewno chcesz usunąć zdjęcie?", [
+      { text: "Anuluj" },
+      {
+        text: "Usuń",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setUploading(true);
+            if (!asset) return;
+            await deleteAssetImage(Number(asset.id));
+            const updated = await getAssetById(Number(asset.id));
+            setAsset(updated);
+          } catch (err) {
+            Alert.alert("Błąd", "Nie udało się usunąć zdjęcia.");
+          } finally {
+            setUploading(false);
+          }
+        },
+      },
+    ]);
+  };
 
   useEffect(() => {
     async function load() {
@@ -63,7 +118,7 @@ export default function EditAssetScreen() {
         Alert.alert("Błąd", "Nie udało się pobrać danych sprzętu");
       }
     }
-
+    
     async function loadOptions() {
       try {
         const [c, m, s, l] = await Promise.all([
@@ -151,6 +206,31 @@ export default function EditAssetScreen() {
           ))}
         </Picker>
 
+        <Text style={[styles.label, { marginTop: 16 }]}>Zdjęcie assetu</Text> 
+        <View style={{ marginVertical: 16, alignItems: "center" }}>
+          {asset?.image ? (
+            <View style={{ alignItems: "center" }}>
+              <Image
+                source={{ uri: asset.image }}
+                style={{ width: 200, height: 200, borderRadius: 10 }}
+              />
+              <TouchableOpacity style={styles.deleteBtn} onPress={removeImage}>
+                <Text style={{ color: "#fff" }}>Usuń zdjęcie</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <Text style={{ marginBottom: 8 }}>Brak zdjęcia</Text>
+          )}
+
+          <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+            <Text style={{ color: "#fff" }}>
+              {uploading ? "Wgrywanie..." : "Wgraj zdjęcie"}
+            </Text>
+          </TouchableOpacity>
+
+          {uploading && <ActivityIndicator style={{ marginTop: 8 }} size="large" color="#007bff" />}
+        </View>
+
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveText}>Zapisz</Text>
         </TouchableOpacity>
@@ -178,4 +258,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveText: { color: "#fff", fontWeight: "700" },
+  deleteBtn: {
+  backgroundColor: "#dc3545",
+  padding: 8,
+  borderRadius: 6,
+  marginTop: 6,
+  alignItems: "center",
+  },
+  uploadBtn: {
+  backgroundColor: "#007bff",
+  padding: 12,
+  borderRadius: 6,
+  alignItems: "center",
+  marginTop: 8,
+  },
 });

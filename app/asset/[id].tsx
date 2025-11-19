@@ -1,17 +1,17 @@
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { api } from "../../lib/api";
 import { AssetDetails } from "../../lib/types";
 
 export default function AssetDetailsScreen() {
-    const { id } = useLocalSearchParams<{ id: string }>();
-    const navigation = useNavigation();
-    const [assetDetails, setAsset] = useState<AssetDetails | null>(null);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const navigation = useNavigation();
+  const [assetDetails, setAsset] = useState<AssetDetails | null>(null);
 
-    useEffect(() => {
-        async function load() {
-            try {
+  useEffect(() => {
+    async function load() {
+      try {
         const res = await api.get<AssetDetails>(`hardware/${id}`);
         setAsset(res.data);
         navigation.setOptions({
@@ -34,7 +34,6 @@ export default function AssetDetailsScreen() {
 
   return (
     <ScrollView style={styles.container}>
-
       <View style={styles.row}>
         <Text style={styles.label}>Status:</Text>
         <Text style={styles.value}>{assetDetails.status_label?.name ?? "-"}</Text>
@@ -80,16 +79,30 @@ export default function AssetDetailsScreen() {
         <Text style={styles.value}>{assetDetails.mac_address ?? "-"}</Text>
       </View>
 
-    <View style={styles.row}>
+      <View style={styles.row}>
         <Text style={styles.label}>Utworzono:</Text>
         <Text style={styles.value}>{assetDetails.created_at?.formatted ?? "-"}</Text>
-    </View>
+      </View>
 
-    <View style={styles.row}>
+      <View style={styles.row}>
         <Text style={styles.label}>Zaktualizowano:</Text>
         <Text style={styles.value}>{assetDetails.updated_at?.formatted ?? "-"}</Text>
-    </View>
+      </View>
 
+      <View style={{ marginTop: 32}}>
+        <Text style={styles.sectionTitle}>Zdjęcie aktywa</Text>
+      </View>
+
+      <View style={{ alignItems: "center", marginTop: 24 }}>
+        {assetDetails.image ? (
+          <Image
+            source={{ uri: assetDetails.image }}
+            style={styles.assetImage}
+          />
+        ) : (
+          <Text style={{ color: "#888" }}>Brak zdjęcia</Text>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -97,8 +110,19 @@ export default function AssetDetailsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#fff" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 16 },
   row: { flexDirection: "row", marginBottom: 8 },
   label: { fontWeight: "600", width: 140 },
   value: { flex: 1, flexWrap: "wrap" },
+  assetImage: {
+    width: 360,
+    height: 720,
+    borderRadius: 12,
+    resizeMode: "cover",
+    backgroundColor: "#eee",
+  },
+    sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#333",
+  },
 });

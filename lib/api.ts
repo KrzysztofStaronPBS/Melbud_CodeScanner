@@ -53,3 +53,25 @@ export async function createAsset(payload: any) {
   const res = await api.post("/hardware", payload);
   return res.data;
 }
+
+export async function uploadAssetImage(id: number, fileUri: string) {
+  const formData = new FormData();
+  formData.append("image", {
+    uri: fileUri,
+    name: "photo.jpg",
+    type: "image/jpeg",
+  } as any);
+
+  const res = await api.post(`/hardware/${id}/image`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data;
+}
+
+export async function deleteAssetImage(id: number) {
+  const res = await api.delete(`/hardware/${id}/image`);
+  return res.data;
+}
