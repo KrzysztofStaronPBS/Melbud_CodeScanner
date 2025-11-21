@@ -3,7 +3,7 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { deleteAssetImage, getAssetById, getCompanies, getLocations, getModels, getStatuses, updateAsset, uploadAssetImage } from "../../../lib/api";
+import { deleteModelImage, getAssetById, getCompanies, getLocations, getModels, getStatuses, updateAsset, uploadModelImage } from "../../../lib/api";
 import { AssetDetails } from "../../../lib/types";
 
 import * as ImagePicker from "expo-image-picker";
@@ -56,7 +56,7 @@ export default function EditAssetScreen() {
     try {
       setUploading(true);
       if (!asset) return;
-      await uploadAssetImage(Number(asset.id), uri);
+      await uploadModelImage(Number(asset.model?.id), uri);
       const updated = await getAssetById(Number(asset.id));
       setAsset(updated);
     } catch (err) {
@@ -76,7 +76,7 @@ export default function EditAssetScreen() {
           try {
             setUploading(true);
             if (!asset) return;
-            await deleteAssetImage(Number(asset.id));
+            await deleteModelImage(Number(asset.model?.id));
             const updated = await getAssetById(Number(asset.id));
             setAsset(updated);
           } catch (err) {
@@ -208,10 +208,10 @@ export default function EditAssetScreen() {
 
         <Text style={[styles.label, { marginTop: 16 }]}>Zdjęcie assetu</Text> 
         <View style={{ marginVertical: 16, alignItems: "center" }}>
-          {asset?.image ? (
+          {asset?.model?.image ? (
             <View style={{ alignItems: "center" }}>
               <Image
-                source={{ uri: asset.image }}
+                source={{ uri: asset.model.image }}
                 style={{ width: 200, height: 200, borderRadius: 10 }}
               />
               <TouchableOpacity style={styles.deleteBtn} onPress={removeImage}>

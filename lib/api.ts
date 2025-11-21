@@ -54,7 +54,7 @@ export async function createAsset(payload: any) {
   return res.data;
 }
 
-export async function uploadAssetImage(id: number, fileUri: string) {
+export async function uploadModelImage(modelId: number, fileUri: string) {
   const formData = new FormData();
   formData.append("image", {
     uri: fileUri,
@@ -62,7 +62,7 @@ export async function uploadAssetImage(id: number, fileUri: string) {
     type: "image/jpeg",
   } as any);
 
-  const res = await api.post(`/hardware/${id}/image`, formData, {
+  const res = await api.post(`/models/${modelId}/image`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -71,7 +71,7 @@ export async function uploadAssetImage(id: number, fileUri: string) {
   return res.data;
 }
 
-export async function deleteAssetImage(id: number) {
-  const res = await api.delete(`/hardware/${id}/image`);
+export async function deleteModelImage(modelId: number) {
+  const res = await api.delete(`/models/${modelId}/image`);
   return res.data;
 }

@@ -25,6 +25,7 @@ export interface Category {
 export interface Model {
   id?: number;
   name?: string;
+  image?: string;
 }
 
 export interface DateField {

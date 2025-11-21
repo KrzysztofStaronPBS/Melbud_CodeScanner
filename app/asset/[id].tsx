@@ -94,9 +94,9 @@ export default function AssetDetailsScreen() {
       </View>
 
       <View style={{ alignItems: "center", marginTop: 24 }}>
-        {assetDetails.image ? (
+        {assetDetails.model?.image ? (
           <Image
-            source={{ uri: assetDetails.image }}
+            source={{ uri: assetDetails.model.image }}
             style={styles.assetImage}
           />
         ) : (
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   value: { flex: 1, flexWrap: "wrap" },
   assetImage: {
     width: 360,
-    height: 720,
+    height: 360,
     borderRadius: 12,
     resizeMode: "cover",
     backgroundColor: "#eee",
