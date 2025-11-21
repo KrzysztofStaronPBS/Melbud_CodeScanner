@@ -49,3 +49,7 @@ export async function getLocations() {
   return res.data.rows;
 }
 
+export async function createAsset(payload: any) {
+  const res = await api.post("/hardware", payload);
+  return res.data;
+}

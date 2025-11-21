@@ -1,5 +1,6 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -22,9 +23,11 @@ export default function HomeScreen() {
   const [query, setQuery] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    loadAssets();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadAssets();
+    }, [])
+  );
 
   async function loadAssets() {
     setLoading(true);
@@ -81,17 +84,28 @@ export default function HomeScreen() {
     <View style={styles.safeArea}>
       <StatusBar style="dark" backgroundColor="#f5f5f5" />
       <View style={styles.container}>
-        <TextInput
-          style={styles.search}
-          placeholder="Szukaj po nazwie lub tagu..."
-          value={query}
-          onChangeText={setQuery}
-        />
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.search}
+            placeholder="Szukaj po nazwie lub tagu..."
+            value={query}
+            onChangeText={setQuery}
+          />
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push("/asset/add")}
+          >
+            <Text style={styles.addButtonText}>＋</Text>
+          </TouchableOpacity>
+        </View>
+
         {loading ? (
           <Text>Pobieram dane...</Text>
         ) : (
           <FlatList
             data={filtered}
+            refreshing={loading}
+            onRefresh={loadAssets}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View style={styles.itemRow}>
@@ -131,13 +145,33 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#f5f5f5" },
   container: { flex: 1, backgroundColor: "#f5f5f5" },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 12,
+    marginTop: 12,
+  },
   search: {
+    flex: 1,
     backgroundColor: "#fff",
     padding: 10,
-    margin: 12,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: "#ccc",
+  },
+  addButton: {
+    marginLeft: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: "#4CAF50",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 28,
+    lineHeight: 28,
   },
   itemRow: {
     backgroundColor: "#fff",
