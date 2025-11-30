@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -5,13 +7,15 @@ import { api } from "../../lib/api";
 import { AssetDetails } from "../../lib/types";
 
 export default function AssetDetailsScreen() {
-    const { id } = useLocalSearchParams<{ id: string }>();
-    const navigation = useNavigation();
-    const [assetDetails, setAsset] = useState<AssetDetails | null>(null);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const navigation = useNavigation();
+  const [assetDetails, setAsset] = useState<AssetDetails | null>(null);
+  const theme = useColorScheme() ?? "light";
+  const C = Colors[theme];
 
-    useEffect(() => {
-        async function load() {
-            try {
+  useEffect(() => {
+    async function load() {
+      try {
         const res = await api.get<AssetDetails>(`hardware/${id}`);
         setAsset(res.data);
         navigation.setOptions({
@@ -27,77 +31,38 @@ export default function AssetDetailsScreen() {
   if (!assetDetails) {
     return (
       <View style={styles.center}>
-        <Text>Ładowanie danych...</Text>
+        <Text style={{ color: C.text }}>Ładowanie danych...</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Status:</Text>
-        <Text style={styles.value}>{assetDetails.status_label?.name ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Firma:</Text>
-        <Text style={styles.value}>{assetDetails.company?.name ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Nazwa nabytku:</Text>
-        <Text style={styles.value}>{assetDetails.name ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Producent:</Text>
-        <Text style={styles.value}>{assetDetails.manufacturer?.name ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Kategoria:</Text>
-        <Text style={styles.value}>{assetDetails.category?.name ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Model:</Text>
-        <Text style={styles.value}>{assetDetails.model?.name ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Numer modelu:</Text>
-        <Text style={styles.value}>{assetDetails.model_number ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>Opis:</Text>
-        <Text style={styles.value}>{assetDetails.notes ?? "-"}</Text>
-      </View>
-
-      <View style={styles.row}>
-        <Text style={styles.label}>MAC:</Text>
-        <Text style={styles.value}>{assetDetails.mac_address ?? "-"}</Text>
-      </View>
-
-    <View style={styles.row}>
-        <Text style={styles.label}>Utworzono:</Text>
-        <Text style={styles.value}>{assetDetails.created_at?.formatted ?? "-"}</Text>
-    </View>
-
-    <View style={styles.row}>
-        <Text style={styles.label}>Zaktualizowano:</Text>
-        <Text style={styles.value}>{assetDetails.updated_at?.formatted ?? "-"}</Text>
-    </View>
-
+    <ScrollView style={[styles.container, { backgroundColor: C.background }]}>
+      {[
+        ["Status", assetDetails.status_label?.name],
+        ["Firma", assetDetails.company?.name],
+        ["Nazwa nabytku", assetDetails.name],
+        ["Producent", assetDetails.manufacturer?.name],
+        ["Kategoria", assetDetails.category?.name],
+        ["Model", assetDetails.model?.name],
+        ["Numer modelu", assetDetails.model_number],
+        ["Opis", assetDetails.notes],
+        ["MAC", assetDetails.mac_address],
+        ["Utworzono", assetDetails.created_at?.formatted],
+        ["Zaktualizowano", assetDetails.updated_at?.formatted],
+      ].map(([label, value]) => (
+        <View key={label} style={styles.row}>
+          <Text style={[styles.label, { color: C.text }]}>{label}:</Text>
+          <Text style={[styles.value, { color: C.text }]}>{value ?? "-"}</Text>
+        </View>
+      ))}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 16 },
   row: { flexDirection: "row", marginBottom: 8 },
   label: { fontWeight: "600", width: 140 },
   value: { flex: 1, flexWrap: "wrap" },

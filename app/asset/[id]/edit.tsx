@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -9,30 +11,23 @@ import { AssetDetails } from "../../../lib/types";
 export default function EditAssetScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const navigation = useNavigation();
+  const theme = useColorScheme() ?? "light";
+  const C = Colors[theme];
 
   const [asset, setAsset] = useState<AssetDetails | null>(null);
-
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
   const [modelNumber, setModelNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [mac, setMac] = useState("");
-  const [company, setCompany] = useState("");
-  const [manufacturer, setManufacturer] = useState("");
-  const [category, setCategory] = useState("");
-  const [model, setModel] = useState("");
-  const [status, setStatus] = useState("");
-
+  const [companyId, setCompanyId] = useState<number | null>(null);
+  const [modelId, setModelId] = useState<number | null>(null);
+  const [statusId, setStatusId] = useState<number | null>(null);
   const [companies, setCompanies] = useState<any[]>([]);
   const [models, setModels] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
-
-  const [companyId, setCompanyId] = useState<number | null>(null);
-  const [modelId, setModelId] = useState<number | null>(null);
-  const [statusId, setStatusId] = useState<number | null>(null);
-
-  const navigation = useNavigation();
 
   useEffect(() => {
     async function load() {
@@ -45,12 +40,6 @@ export default function EditAssetScreen() {
         setModelNumber(data.model_number ?? "");
         setNotes(data.notes ?? "");
         setMac(data.mac_address ?? "");
-
-        setCompany(data.company?.name ?? "");
-        setManufacturer(data.manufacturer?.name ?? "");
-        setCategory(data.category?.name ?? "");
-        setModel(data.model?.name ?? "");
-        setStatus(data.status_label?.name ?? "");
 
         setCompanyId(data.company?.id ?? null);
         setModelId(data.model?.id ?? null);
@@ -80,9 +69,10 @@ export default function EditAssetScreen() {
         console.error("Błąd pobierania opcji", err);
       }
     }
+
     loadOptions();
     if (id) load();
-  }, [id]);
+  }, [id, navigation]);
 
   const handleSave = async () => {
     try {
@@ -104,54 +94,84 @@ export default function EditAssetScreen() {
     }
   };
 
-  if (!asset) return <Text>Ładowanie...</Text>;
+  if (!asset) return <Text style={{ color: C.text }}>Ładowanie...</Text>;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.background }} edges={["bottom"]}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={styles.label}>Nazwa</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} />
+        <Text style={[styles.label, { color: C.text }]}>Nazwa</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={name}
+          onChangeText={setName}
+        />
 
-        <Text style={styles.label}>Tag</Text>
-        <TextInput style={styles.input} value={tag} onChangeText={setTag} />
+        <Text style={[styles.label, { color: C.text }]}>Tag</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={tag}
+          onChangeText={setTag}
+        />
 
-        <Text style={styles.label}>Numer modelu</Text>
-        <TextInput style={styles.input} value={modelNumber} onChangeText={setModelNumber} />
+        <Text style={[styles.label, { color: C.text }]}>Numer modelu</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={modelNumber}
+          onChangeText={setModelNumber}
+        />
 
-        <Text style={styles.label}>Opis</Text>
-        <TextInput style={[styles.input, { height: 80 }]} value={notes} onChangeText={setNotes} multiline />
+        <Text style={[styles.label, { color: C.text }]}>Opis</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50", height: 80 }]}
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+        />
 
-        <Text style={styles.label}>MAC</Text>
-        <TextInput style={styles.input} value={mac} onChangeText={setMac} />
+        <Text style={[styles.label, { color: C.text }]}>MAC</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={mac}
+          onChangeText={setMac}
+        />
 
-        <Text style={styles.label}>Firma</Text>
-        <Picker selectedValue={companyId} onValueChange={(val) => setCompanyId(val)}>
+        <Text style={[styles.label, { color: C.text }]}>Firma</Text>
+        <Picker
+          selectedValue={companyId}
+          onValueChange={(val) => setCompanyId(val)}
+          style={{ color: C.text }}
+        >
           {companies.map((c) => (
             <Picker.Item key={c.id} label={c.name} value={c.id} />
           ))}
         </Picker>
 
-        <Text style={styles.label}>Producent</Text>
-        <TextInput style={styles.input} value={manufacturer} onChangeText={setManufacturer} />
-
-        <Text style={styles.label}>Kategoria</Text>
-        <TextInput style={styles.input} value={category} onChangeText={setCategory} />
-
-        <Text style={styles.label}>Model</Text>
-        <Picker selectedValue={modelId} onValueChange={(val) => setModelId(val)}>
+        <Text style={[styles.label, { color: C.text }]}>Model</Text>
+        <Picker
+          selectedValue={modelId}
+          onValueChange={(val) => setModelId(val)}
+          style={{ color: C.text }}
+        >
           {models.map((m) => (
             <Picker.Item key={m.id} label={m.name} value={m.id} />
           ))}
         </Picker>
 
-        <Text style={styles.label}>Status</Text>
-        <Picker selectedValue={statusId} onValueChange={(val) => setStatusId(val)}>
+        <Text style={[styles.label, { color: C.text }]}>Status</Text>
+        <Picker
+          selectedValue={statusId}
+          onValueChange={(val) => setStatusId(val)}
+          style={{ color: C.text }}
+        >
           {statuses.map((s) => (
             <Picker.Item key={s.id} label={s.name} value={s.id} />
           ))}
         </Picker>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+        <TouchableOpacity
+          style={[styles.saveBtn, { backgroundColor: theme === "dark" ? "#1e88e5" : "#2196f3" }]}
+          onPress={handleSave}
+        >
           <Text style={styles.saveText}>Zapisz</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -160,19 +180,15 @@ export default function EditAssetScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#f5f5f5" },
   label: { fontWeight: "600", marginTop: 12 },
   input: {
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 6,
     padding: 10,
     marginTop: 4,
   },
   saveBtn: {
     marginTop: 24,
-    backgroundColor: "#2196f3",
     padding: 12,
     borderRadius: 6,
     alignItems: "center",

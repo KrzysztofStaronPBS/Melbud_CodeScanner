@@ -3,36 +3,41 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Asset } from "../lib/types";
 
-export default function AssetItem({ asset }: { asset: Asset }) {
+type AssetItemProps = {
+  asset: Asset;
+  backgroundColor?: string;
+  textColor?: string;
+};
+
+export default function AssetItem({ asset, backgroundColor, textColor }: AssetItemProps) {
   const router = useRouter();
   const statusName = asset.status_label?.name || "nieznany";
 
-  // 🎨 Funkcja dobierająca kolor tekstu w zależności od statusu
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "zlikwidowane":
-        return "#D32F2F"; // czerwony
+        return "#D32F2F";
       case "wydany":
-        return "#388E3C"; // zielony
+        return "#388E3C";
       case "gotowy do wydania":
-        return "#F9A825"; // żółto-pomarańczowy
+        return "#F9A825";
       case "do przygotowania":
-        return "#1976D2"; // niebieski
+        return "#1976D2";
       case "rezerwa":
-        return "#7B1FA2"; // fioletowy
+        return "#7B1FA2";
       default:
-        return "#757575"; // szary (domyślny)
+        return "#757575";
     }
   };
 
   return (
     <TouchableOpacity onPress={() => router.push(`/asset/${asset.id}`)}>
-      <View style={styles.card}>
-        <Text style={styles.name}>
+      <View style={[styles.card, { backgroundColor: backgroundColor ?? "#fff" }]}>
+        <Text style={[styles.name, { color: textColor ?? "#212121" }]}>
           {asset.category?.name ?? "Brak kategorii"} {asset.name || "Brak nazwy"}
         </Text>
 
-        <Text style={styles.status}>
+        <Text style={[styles.status, { color: textColor ?? "#333" }]}>
           Status:{" "}
           <Text style={[styles.statusValue, { color: getStatusColor(statusName) }]}>
             {statusName}
@@ -45,7 +50,6 @@ export default function AssetItem({ asset }: { asset: Asset }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
     padding: 12,
     marginVertical: 6,
     marginHorizontal: 12,
@@ -56,11 +60,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 4,
-    color: "#212121",
   },
   status: {
     fontSize: 14,
-    color: "#333",
   },
   statusValue: {
     fontWeight: "bold",

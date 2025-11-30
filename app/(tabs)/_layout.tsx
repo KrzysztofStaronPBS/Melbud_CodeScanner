@@ -4,7 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Tabs, usePathname, useRouter, useSegments } from "expo-router";
+import { Tabs, usePathname, useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -12,29 +12,33 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const segments = useSegments();
   const pathname = usePathname();
   const isScanScreen = pathname === "/scan";
   const insets = useSafeAreaInsets();
+
+  const themeColors = Colors[colorScheme ?? "light"];
 
   return (
     <>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+          tabBarActiveTintColor: themeColors.tint,
+          tabBarInactiveTintColor: themeColors.icon,
           header: () => <AppHeader />,
-          headerStyle: { height: 40 },
-          headerTransparent: false,
           tabBarButton: HapticTab,
           tabBarStyle: {
+            backgroundColor: themeColors.background,
             height: 80 + insets.bottom,
             paddingBottom: insets.bottom > 0 ? insets.bottom : 4,
             paddingTop: 4,
+            borderTopColor: themeColors.icon + "40",
+            borderTopWidth: 1,
           },
           tabBarLabelStyle: {
             fontSize: 14,
             fontWeight: "600",
             textAlign: "center",
+            color: themeColors.text,
           },
         }}
       >
@@ -60,8 +64,9 @@ export default function TabLayout() {
 
       {!isScanScreen && (
         <TouchableOpacity
-          style={[styles.fab,
-           { bottom: (80 + insets.bottom) + 16 }
+          style={[
+            styles.fab,
+            { bottom: (80 + insets.bottom) + 16 }
           ]}
           onPress={() => router.push("/scan")}
         >
@@ -83,26 +88,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,
-  },
-
-header: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  zIndex: 10,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingVertical: 10,
-  backgroundColor: "#fff",
-  elevation: 2,
-},
-
-  headerText: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginLeft: 8,
-    color: "#00897B",
   },
 });

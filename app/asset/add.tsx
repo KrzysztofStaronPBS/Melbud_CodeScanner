@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -8,6 +10,8 @@ import { createAsset, getCompanies, getLocations, getModels, getStatuses } from 
 export default function AddAssetScreen() {
   const router = useRouter();
   const navigation = useNavigation();
+  const theme = useColorScheme() ?? "light";
+  const C = Colors[theme];
 
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
@@ -27,6 +31,7 @@ export default function AddAssetScreen() {
 
   useEffect(() => {
     navigation.setOptions({ title: "Dodaj sprzęt" });
+
     async function loadOptions() {
       try {
         const [c, m, s, l] = await Promise.all([
@@ -43,8 +48,9 @@ export default function AddAssetScreen() {
         console.error("Błąd pobierania danych", err);
       }
     }
+
     loadOptions();
-  }, []);
+  }, [navigation]);
 
   const handleSave = async () => {
     try {
@@ -69,73 +75,103 @@ export default function AddAssetScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.background }} edges={["bottom"]}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={styles.label}>Nazwa</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} />
-
-        <Text style={styles.label}>Tag</Text>
-        <TextInput style={styles.input} value={tag} onChangeText={setTag} />
-
-        <Text style={styles.label}>Numer modelu</Text>
-        <TextInput style={styles.input} value={modelNumber} onChangeText={setModelNumber} />
-
-        <Text style={styles.label}>Opis</Text>
+        {/* Nazwa */}
+        <Text style={[styles.label, { color: C.text }]}>Nazwa</Text>
         <TextInput
-          style={[styles.input, { height: 80 }]}
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={name}
+          onChangeText={setName}
+        />
+
+        {/* Tag */}
+        <Text style={[styles.label, { color: C.text }]}>Tag</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={tag}
+          onChangeText={setTag}
+        />
+
+        {/* Numer modelu */}
+        <Text style={[styles.label, { color: C.text }]}>Numer modelu</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={modelNumber}
+          onChangeText={setModelNumber}
+        />
+
+        {/* Opis */}
+        <Text style={[styles.label, { color: C.text }]}>Opis</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50", height: 80 }]}
           value={notes}
           onChangeText={setNotes}
           multiline
         />
 
-        <Text style={styles.label}>MAC</Text>
-        <TextInput style={styles.input} value={mac} onChangeText={setMac} />
+        {/* MAC */}
+        <Text style={[styles.label, { color: C.text }]}>MAC</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
+          value={mac}
+          onChangeText={setMac}
+        />
 
-        <Text style={styles.label}>Firma</Text>
+        {/* Firma */}
+        <Text style={[styles.label, { color: C.text }]}>Firma</Text>
         <Picker
-        selectedValue={companyId}
-        onValueChange={(value) => setCompanyId(value)}
+          selectedValue={companyId}
+          onValueChange={(value) => setCompanyId(value)}
+          style={{ color: C.text, backgroundColor: C.background }}
         >
-        <Picker.Item label="-- wybierz firmę --" value={null} />
-        {companies.map((c) => (
+          <Picker.Item label="-- wybierz firmę --" value={null} />
+          {companies.map((c) => (
             <Picker.Item key={c.id} label={c.name} value={c.id} />
-        ))}
+          ))}
         </Picker>
 
-        <Text style={styles.label}>Model</Text>
+        {/* Model */}
+        <Text style={[styles.label, { color: C.text }]}>Model</Text>
         <Picker
-        selectedValue={modelId}
-        onValueChange={(value) => setModelId(value)}
+          selectedValue={modelId}
+          onValueChange={(value) => setModelId(value)}
+          style={{ color: C.text, backgroundColor: C.background }}
         >
-        <Picker.Item label="-- wybierz model --" value={null} />
-        {models.map((m) => (
+          <Picker.Item label="-- wybierz model --" value={null} />
+          {models.map((m) => (
             <Picker.Item key={m.id} label={m.name} value={m.id} />
-        ))}
+          ))}
         </Picker>
 
-        <Text style={styles.label}>Status</Text>
+        {/* Status */}
+        <Text style={[styles.label, { color: C.text }]}>Status</Text>
         <Picker
-        selectedValue={statusId}
-        onValueChange={(value) => setStatusId(value)}
+          selectedValue={statusId}
+          onValueChange={(value) => setStatusId(value)}
+          style={{ color: C.text, backgroundColor: C.background }}
         >
-        <Picker.Item label="-- wybierz status --" value={null} />
-        {statuses.map((s) => (
+          <Picker.Item label="-- wybierz status --" value={null} />
+          {statuses.map((s) => (
             <Picker.Item key={s.id} label={s.name} value={s.id} />
-        ))}
+          ))}
         </Picker>
 
-        <Text style={styles.label}>Lokalizacja</Text>
+        {/* Lokalizacja */}
+        <Text style={[styles.label, { color: C.text }]}>Lokalizacja</Text>
         <Picker
-        selectedValue={locationId}
-        onValueChange={(value) => setLocationId(value)}
+          selectedValue={locationId}
+          onValueChange={(value) => setLocationId(value)}
+          style={{ color: C.text, backgroundColor: C.background }}
         >
-        <Picker.Item label="-- wybierz lokalizację --" value={null} />
-        {locations.map((l) => (
+          <Picker.Item label="-- wybierz lokalizację --" value={null} />
+          {locations.map((l) => (
             <Picker.Item key={l.id} label={l.name} value={l.id} />
-        ))}
+          ))}
         </Picker>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+        {/* Zapisz */}
+        <TouchableOpacity style={[styles.saveBtn, { backgroundColor: "#4CAF50" }]} onPress={handleSave}>
           <Text style={styles.saveText}>Dodaj sprzęt</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -146,16 +182,13 @@ export default function AddAssetScreen() {
 const styles = StyleSheet.create({
   label: { fontWeight: "600", marginTop: 12 },
   input: {
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 6,
     padding: 10,
     marginTop: 4,
   },
   saveBtn: {
     marginTop: 24,
-    backgroundColor: "#4CAF50",
     padding: 12,
     borderRadius: 6,
     alignItems: "center",

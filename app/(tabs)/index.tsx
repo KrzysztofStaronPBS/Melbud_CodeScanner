@@ -16,12 +16,18 @@ import AssetItem from "../../components/AssetItem";
 import { deleteAsset, getAssets } from "../../lib/api";
 import { Asset } from "../../lib/types";
 
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+
 export default function HomeScreen() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [filtered, setFiltered] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
+
   const router = useRouter();
+  const theme = useColorScheme() ?? "light";
+  const C = Colors[theme];
 
   useFocusEffect(
     useCallback(() => {
@@ -81,18 +87,28 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.safeArea}>
-      <StatusBar style="dark" backgroundColor="#f5f5f5" />
-      <View style={styles.container}>
+    <View style={[styles.safeArea, { backgroundColor: C.background }]}>
+      <StatusBar style={theme === "dark" ? "light" : "dark"} />
+
+      <View style={[styles.container, { backgroundColor: C.background }]}>
         <View style={styles.searchContainer}>
           <TextInput
-            style={styles.search}
+            style={[
+              styles.search,
+              {
+                backgroundColor: C.background,
+                color: C.text,
+                borderColor: C.icon + "50",
+              },
+            ]}
             placeholder="Szukaj po nazwie lub tagu..."
+            placeholderTextColor={C.icon}
             value={query}
             onChangeText={setQuery}
           />
+
           <TouchableOpacity
-            style={styles.addButton}
+            style={[styles.addButton]}
             onPress={() => router.push("/asset/add")}
           >
             <Text style={styles.addButtonText}>＋</Text>
@@ -100,7 +116,7 @@ export default function HomeScreen() {
         </View>
 
         {loading ? (
-          <Text>Pobieram dane...</Text>
+          <Text style={{ color: C.text }}>Pobieram dane...</Text>
         ) : (
           <FlatList
             data={filtered}
@@ -108,14 +124,25 @@ export default function HomeScreen() {
             onRefresh={loadAssets}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <View style={styles.itemRow}>
+              <View
+                style={[
+                  styles.itemRow,
+                  {
+                    backgroundColor: C.background,
+                    borderColor: C.icon + "40",
+                  },
+                ]}
+              >
                 <TouchableOpacity
                   style={{ flex: 1 }}
                   onPress={() =>
-                    router.push({ pathname: "/asset/[id]", params: { id: item.id } })
+                    router.push({
+                      pathname: "/asset/[id]",
+                      params: { id: item.id },
+                    })
                   }
                 >
-                  <AssetItem asset={item} />
+                  <AssetItem asset={item} backgroundColor={C.background} textColor={C.text} />
                 </TouchableOpacity>
 
                 <View style={styles.actions}>
@@ -128,7 +155,9 @@ export default function HomeScreen() {
 
                   <TouchableOpacity
                     style={[styles.btn, styles.delete]}
-                    onPress={() => handleDelete(item.id, item.name ?? "nieznany")}
+                    onPress={() =>
+                      handleDelete(item.id, item.name ?? "nieznany")
+                    }
                   >
                     <Text style={styles.btnText}>Usuń</Text>
                   </TouchableOpacity>
@@ -143,8 +172,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#f5f5f5" },
-  container: { flex: 1, backgroundColor: "#f5f5f5" },
+  safeArea: { flex: 1 },
+  container: { flex: 1 },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -153,11 +182,9 @@ const styles = StyleSheet.create({
   },
   search: {
     flex: 1,
-    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#ccc",
   },
   addButton: {
     marginLeft: 8,
@@ -174,7 +201,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   itemRow: {
-    backgroundColor: "#fff",
     marginHorizontal: 12,
     marginBottom: 10,
     borderRadius: 8,
@@ -182,7 +208,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    elevation: 1,
+    borderWidth: 1,
   },
   actions: { flexDirection: "row", gap: 6 },
   btn: {
