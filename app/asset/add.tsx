@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useColorScheme } from "@/hooks/theme-store";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";

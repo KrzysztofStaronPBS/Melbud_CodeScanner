@@ -1,7 +1,7 @@
 import AppHeader from "@/components/AppHeader";
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useColorScheme } from "@/hooks/theme-store";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Tabs, usePathname, useRouter } from "expo-router";
@@ -10,13 +10,13 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? "light";
   const router = useRouter();
   const pathname = usePathname();
   const isScanScreen = pathname === "/scan";
   const insets = useSafeAreaInsets();
 
-  const themeColors = Colors[colorScheme ?? "light"];
+  const themeColors = Colors[colorScheme];
 
   return (
     <>
@@ -66,11 +66,14 @@ export default function TabLayout() {
         <TouchableOpacity
           style={[
             styles.fab,
-            { bottom: (80 + insets.bottom) + 16 }
+            {
+              bottom: 80 + insets.bottom + 16,
+              backgroundColor: themeColors.tint,
+            },
           ]}
           onPress={() => router.push("/scan")}
         >
-          <Ionicons name="qr-code-outline" size={42} color="#fff" />
+          <Ionicons name="qr-code-outline" size={42} color={themeColors.background} />
         </TouchableOpacity>
       )}
     </>
@@ -81,7 +84,6 @@ const styles = StyleSheet.create({
   fab: {
     position: "absolute",
     right: 24,
-    backgroundColor: "#00897B",
     borderRadius: 42,
     width: 84,
     height: 84,

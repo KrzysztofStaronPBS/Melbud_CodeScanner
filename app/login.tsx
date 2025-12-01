@@ -1,13 +1,17 @@
 import AppHeader from "@/components/AppHeader";
+import { useColorScheme } from "@/hooks/theme-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Button, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
 export default function LoginScreen() {
   const [token, setToken] = useState("");
   const [remember, setRemember] = useState(true);
   const router = useRouter();
+
+  const theme = useColorScheme(); 
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -54,12 +58,13 @@ export default function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="Wklej swój klucz API"
+          placeholderTextColor={theme === "dark" ? "#aaa" : "#777"}
           value={token}
           onChangeText={setToken}
         />
         <View style={styles.rememberRow}>
           <Switch value={remember} onValueChange={setRemember} />
-          <Text style={{ marginLeft: 8 }}>Zapamiętaj token</Text>
+          <Text style={styles.text}>Zapamiętaj token</Text>
         </View>
         <Button title="Zaloguj" onPress={handleLogin} />
       </View>
@@ -67,21 +72,43 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#f5f5f5" },
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 20, textAlign: "center" },
-  input: {
-    backgroundColor: "#fff",
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  rememberRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-});
+function createStyles(theme: "light" | "dark") {
+  const isDark = theme === "dark";
+
+  return StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: isDark ? "#121212" : "#f5f5f5",
+    },
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      padding: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "700",
+      marginBottom: 20,
+      textAlign: "center",
+      color: isDark ? "#fff" : "#000",
+    },
+    text: {
+      color: isDark ? "#fff" : "#000",
+      marginLeft: 8,
+    },
+    input: {
+      backgroundColor: isDark ? "#1e1e1e" : "#fff",
+      color: isDark ? "#fff" : "#000",
+      padding: 12,
+      marginBottom: 12,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: isDark ? "#333" : "#ccc",
+    },
+    rememberRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+  });
+}

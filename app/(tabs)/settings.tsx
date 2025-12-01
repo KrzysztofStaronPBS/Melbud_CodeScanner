@@ -32,7 +32,6 @@ export default function SettingsScreen() {
     try {
       setUserChoice(value);
       await setTheme(value);
-      Alert.alert("Zapisano", `Motyw ustawiony na: ${value}`);
     } catch (err) {
       console.error("Błąd zapisu ustawień motywu", err);
       Alert.alert("Błąd", "Nie udało się zapisać ustawienia motywu.");
@@ -65,6 +64,12 @@ export default function SettingsScreen() {
 
       <View style={styles.optionsRow}>
         <ThemeOption
+          label="Systemowy"
+          selected={userChoice === "system"}
+          onPress={() => saveThemePref("system")}
+          theme={theme}
+        />
+        <ThemeOption
           label="Jasny"
           selected={userChoice === "light"}
           onPress={() => saveThemePref("light")}
@@ -75,13 +80,7 @@ export default function SettingsScreen() {
           selected={userChoice === "dark"}
           onPress={() => saveThemePref("dark")}
           theme={theme}
-        />
-        <ThemeOption
-          label="Systemowy"
-          selected={userChoice === "system"}
-          onPress={() => saveThemePref("system")}
-          theme={theme}
-        />
+        /> 
       </View>
 
       <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />

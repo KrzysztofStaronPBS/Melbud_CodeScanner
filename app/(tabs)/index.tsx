@@ -17,7 +17,7 @@ import { deleteAsset, getAssets } from "../../lib/api";
 import { Asset } from "../../lib/types";
 
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useColorScheme } from "@/hooks/theme-store";
 
 export default function HomeScreen() {
   const [assets, setAssets] = useState<Asset[]>([]);
