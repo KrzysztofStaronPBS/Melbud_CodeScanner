@@ -1,4 +1,5 @@
 import AppHeader from "@/components/AppHeader";
+import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/theme-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -10,8 +11,10 @@ export default function LoginScreen() {
   const [remember, setRemember] = useState(true);
   const router = useRouter();
 
-  const theme = useColorScheme(); 
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const theme = useColorScheme() ?? "light";
+  const C = Colors[theme];
+
+  const styles = useMemo(() => createStyles(C), [C]);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -55,30 +58,31 @@ export default function LoginScreen() {
       <AppHeader />
       <View style={styles.container}>
         <Text style={styles.title}>Podaj klucz API</Text>
+
         <TextInput
           style={styles.input}
           placeholder="Wklej swój klucz API"
-          placeholderTextColor={theme === "dark" ? "#aaa" : "#777"}
+          placeholderTextColor={C.icon}
           value={token}
           onChangeText={setToken}
         />
+
         <View style={styles.rememberRow}>
           <Switch value={remember} onValueChange={setRemember} />
           <Text style={styles.text}>Zapamiętaj token</Text>
         </View>
+
         <Button title="Zaloguj" onPress={handleLogin} />
       </View>
     </View>
   );
 }
 
-function createStyles(theme: "light" | "dark") {
-  const isDark = theme === "dark";
-
+function createStyles(C: any) {
   return StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: isDark ? "#121212" : "#f5f5f5",
+      backgroundColor: C.background,
     },
     container: {
       flex: 1,
@@ -90,20 +94,20 @@ function createStyles(theme: "light" | "dark") {
       fontWeight: "700",
       marginBottom: 20,
       textAlign: "center",
-      color: isDark ? "#fff" : "#000",
+      color: C.text,
     },
     text: {
-      color: isDark ? "#fff" : "#000",
+      color: C.text,
       marginLeft: 8,
     },
     input: {
-      backgroundColor: isDark ? "#1e1e1e" : "#fff",
-      color: isDark ? "#fff" : "#000",
+      backgroundColor: C.background,
+      color: C.text,
       padding: 12,
       marginBottom: 12,
       borderRadius: 6,
       borderWidth: 1,
-      borderColor: isDark ? "#333" : "#ccc",
+      borderColor: C.icon + "50",
     },
     rememberRow: {
       flexDirection: "row",
