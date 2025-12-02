@@ -1,122 +1,197 @@
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { useNavigation, useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { api } from "../lib/api";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 
-export default function ScanScreen() {
-  const [permission, requestPermission] = useCameraPermissions();
+import { setTheme, ThemeChoice, useThemeStore } from "@/hooks/theme-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "@react-navigation/native";
+
+export default function SettingsScreen() {
   const router = useRouter();
-  const lastScanTime = useRef(0);
-  const navigation = useNavigation();
-  
-    useEffect(() => {
-      navigation.setOptions({
-        title: "Zeskanuj kod QR",
+  const themePref = useThemeStore();
+
+  const [userChoice, setUserChoice] = useState<ThemeChoice>("system");
+
+  const theme = useTheme();
+  const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    AsyncStorage.getItem("app_theme").then(saved => {
+      if (saved === "light" || saved === "dark" || saved === "system") {
+        setUserChoice(saved);
+      } else {
+        setUserChoice("system");
+      }
     });
-    }, [navigation]);
+  }, []);
 
-  if (!permission) return <View />;
-    if (!permission.granted) {
-      return (
-        <View style={styles.center}>
-          <Text>Brak dostępu do kamery</Text>
-          <Button onPress={requestPermission} title="Zezwól" />
-        </View>
-      );
-  }
-
-  const handleScan = async (data: string) => {
-    const now = Date.now();
-    if (now - lastScanTime.current < 2000) return;
-    lastScanTime.current = now;
-
-    const id = data.split("/").pop()?.trim() ?? "";
-    if (!id || isNaN(Number(id))) {
-      console.warn("Niepoprawny kod QR:", data);
-      return;
-    }
-
+  const saveThemePref = async (value: ThemeChoice) => {
     try {
-      await api.get(`hardware/${id}`);
-      router.push({ pathname: "/asset/[id]", params: { id } });
-    } catch (err: any) {
-      console.error("Błąd API:", err);
+      setUserChoice(value);
+      await setTheme(value);
+    } catch (err) {
+      console.error("Błąd zapisu ustawień motywu", err);
+      Alert.alert("Błąd", "Nie udało się zapisać ustawienia motywu.");
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <CameraView
-        style={StyleSheet.absoluteFillObject}
-        facing="back"
-        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-        onBarcodeScanned={({ data }) => handleScan(data)}
-      />
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("apiToken");
+      await AsyncStorage.removeItem("user");
+      router.replace("/login");
+    } catch (err) {
+      Alert.alert("Błąd", "Nie udało się wylogować");
+    }
+  };
 
-      <View style={styles.targetBox}>
-        <View style={styles.cornerTopLeft} />
-        <View style={styles.cornerTopRight} />
-        <View style={styles.cornerBottomLeft} />
-        <View style={styles.cornerBottomRight} />
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.header, { color: theme.colors.text }]}>Ustawienia</Text>
+
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Motyw aplikacji</Text>
+
+      <View style={styles.optionsRow}>
+        <ThemeOption
+          label="Systemowy"
+          selected={userChoice === "system"}
+          onPress={() => saveThemePref("system")}
+          theme={theme}
+        />
+        <ThemeOption
+          label="Jasny"
+          selected={userChoice === "light"}
+          onPress={() => saveThemePref("light")}
+          theme={theme}
+        />
+        <ThemeOption
+          label="Ciemny"
+          selected={userChoice === "dark"}
+          onPress={() => saveThemePref("dark")}
+          theme={theme}
+        />
       </View>
 
+      <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
+
+      <Pressable style={[styles.logoutBtn, { backgroundColor: theme.colors.notification }]} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Wyloguj</Text>
+      </Pressable>
     </View>
   );
 }
 
+function ThemeOption({
+  label,
+  selected,
+  onPress,
+  theme,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+  theme: any;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.option,
+        {
+          backgroundColor: selected
+            ? theme.colors.card
+            : theme.colors.background,
+          borderWidth: 1,
+          borderColor: selected ? theme.colors.primary : theme.colors.border,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.radio,
+          { borderColor: selected ? theme.colors.primary : theme.colors.border },
+        ]}
+      >
+        {selected && <View style={[styles.radioInner, { backgroundColor: theme.colors.primary }]} />}
+      </View>
+      <Text style={[styles.optionLabel, { color: theme.colors.text }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "black" },
-  targetBox: {
-    position: "absolute",
-    top: "35%",
-    left: "50%",
-    width: 250,
-    height: 250,
-    marginLeft: -125,
-    borderColor: "#00ff99",
-    borderWidth: 1,
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  cornerTopLeft: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: 30,
-    height: 4,
-    backgroundColor: "#00ff99",
+  header: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 18,
   },
-  cornerTopRight: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: 30,
-    height: 4,
-    backgroundColor: "#00ff99",
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
   },
-  cornerBottomLeft: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    width: 30,
-    height: 4,
-    backgroundColor: "#00ff99",
+  optionsRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 18,
   },
-  cornerBottomRight: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 30,
-    height: 4,
-    backgroundColor: "#00ff99",
-  },
-  textOverlay: {
-    position: "absolute",
-    bottom: 100,
-    alignSelf: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    padding: 10,
+  option: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 8,
   },
-  text: { color: "white", fontSize: 16, textAlign: "center" },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
+  radio: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  optionLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  divider: {
+    height: 1,
+    marginVertical: 12,
+  },
+  logoutBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: "stretch",
+  },
+  logoutText: {
+    color: "#fff",
+    fontWeight: "700",
+    textAlign: "center",
+  },
 });
