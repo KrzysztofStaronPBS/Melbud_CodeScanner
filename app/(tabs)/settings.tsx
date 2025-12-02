@@ -24,6 +24,7 @@ export default function SettingsScreen() {
     AsyncStorage.getItem("app_theme").then(saved => {
       if (saved === "light" || saved === "dark" || saved === "system") {
         setUserChoice(saved);
+        setTheme(saved);
       }
     });
   }, []);
@@ -32,6 +33,7 @@ export default function SettingsScreen() {
     try {
       setUserChoice(value);
       await setTheme(value);
+      await AsyncStorage.setItem("app_theme", value);
     } catch (err) {
       console.error("Błąd zapisu ustawień motywu", err);
       Alert.alert("Błąd", "Nie udało się zapisać ustawienia motywu.");

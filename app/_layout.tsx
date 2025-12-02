@@ -3,7 +3,7 @@ import { Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/theme-store";
+import { loadInitialTheme, useColorScheme } from "@/hooks/theme-store";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
@@ -20,6 +20,7 @@ export default function RootLayout() {
   const pathname = usePathname();
 
   useEffect(() => {
+    loadInitialTheme();
     const checkLogin = async () => {
       try {
         const user = await AsyncStorage.getItem("user");
