@@ -3,8 +3,9 @@ import { useColorScheme } from "@/hooks/theme-store";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { api } from "../../lib/api";
+import { getAssetById } from "../../lib/api";
 import { AssetDetails } from "../../lib/types";
+
 
 export default function AssetDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,10 +17,10 @@ export default function AssetDetailsScreen() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get<AssetDetails>(`hardware/${id}`);
-        setAsset(res.data);
+        const data = await getAssetById(Number(id));
+        setAsset(data);
         navigation.setOptions({
-          title: res.data.name || res.data.asset_tag || "Szczegóły",
+          title: data.name || data.asset_tag || "Szczegóły",
         });
       } catch (err) {
         console.error("Błąd API:", err);

@@ -19,6 +19,8 @@ import { Asset } from "../../lib/types";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/theme-store";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function HomeScreen() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [filtered, setFiltered] = useState<Asset[]>([]);
@@ -31,7 +33,15 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadAssets();
+      const checkAndLoad = async () => {
+        const token = await AsyncStorage.getItem("apiToken");
+        const serverUrl = await AsyncStorage.getItem("serverUrl");
+
+        if (token && serverUrl) {
+          await loadAssets();
+        }
+      };
+      checkAndLoad();
     }, [])
   );
 
@@ -117,6 +127,8 @@ export default function HomeScreen() {
 
         {loading ? (
           <Text style={{ color: C.text }}>Pobieram dane...</Text>
+        ) : assets.length === 0 ? (
+          <Text style={{ color: C.text }}>Brak danych lub brak konfiguracji</Text>
         ) : (
           <FlatList
             data={filtered}

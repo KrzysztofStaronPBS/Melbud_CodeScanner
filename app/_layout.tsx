@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { Stack, usePathname, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
@@ -16,26 +16,18 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     loadInitialTheme();
     const checkLogin = async () => {
-      try {
-        const user = await AsyncStorage.getItem("user");
-
-        if (!user && pathname !== "/login") {
-          router.replace("/login");
-        } else if (user && pathname === "/login") {
-          router.replace("/");
-        }
-      } finally {
-        setLoading(false);
-      }
+      const token = await AsyncStorage.getItem("apiToken");
+      const serverUrl = await AsyncStorage.getItem("serverUrl");
+      setIsAuthenticated(!!token && !!serverUrl);
+      setLoading(false);
     };
     checkLogin();
-  }, [pathname]);
+  }, []);
 
   if (loading) {
     return (
