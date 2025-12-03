@@ -9,38 +9,44 @@ export default function ScanScreen() {
   const router = useRouter();
   const lastScanTime = useRef(0);
   const navigation = useNavigation();
-  
-  useEffect(() => {
-    navigation.setOptions({
-      title: "Zeskanuj kod QR",
-    });
-    }, [navigation]);
 
-    if (!permission) return <View />;
-    if (!permission.granted) {
-      return (
-        <View style={styles.center}>
-          <Text>Brak dostępu do kamery</Text>
-          <Button onPress={requestPermission} title="Zezwól" />
-        </View>
-      );
+  useEffect(() => {
+    try {
+      navigation.setOptions({
+        title: "Zeskanuj kod QR",
+      });
+    } catch (_) {
+    }
+  }, [navigation]);
+
+  if (!permission) return <View />;
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.center}>
+        <Text>Brak dostępu do kamery</Text>
+        <Button onPress={requestPermission} title="Zezwól" />
+      </View>
+    );
   }
 
   const handleScan = async (data: string) => {
     const now = Date.now();
     if (now - lastScanTime.current < 2000) return;
     lastScanTime.current = now;
+
     const id = data.split("/").pop()?.trim() ?? "";
     if (!id || isNaN(Number(id))) {
       console.warn("Niepoprawny kod QR:", data);
       return;
-       }
-       try {
+    }
+
+    try {
       await api.get(`hardware/${id}`);
-      router.push({ pathname: "/asset/[id]", params: { id } });
-    } catch (err: any) {
-      console.error("Błąd API:", err);
-       }
+      router.push(`/asset/${id}`);
+    } catch (err) {
+      console.warn("Błąd API:", (err as any)?.message || err);
+    }
   };
 
   return (
@@ -49,24 +55,27 @@ export default function ScanScreen() {
         style={StyleSheet.absoluteFillObject}
         facing="back"
         barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-        onBarcodeScanned={({ data }) => handleScan(data)}
+        onBarcodeScanned={(result) => {
+          if (!result?.data) return;
+          handleScan(result.data);
+        }}
       />
+
       <View style={styles.targetBox}>
         <View style={styles.cornerTopLeft} />
         <View style={styles.cornerTopRight} />
         <View style={styles.cornerBottomLeft} />
         <View style={styles.cornerBottomRight} />
-        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     flex: 1,
-    backgroundColor: "black" 
+    backgroundColor: "black",
   },
-
   targetBox: {
     position: "absolute",
     top: "35%",
@@ -77,7 +86,6 @@ const styles = StyleSheet.create({
     borderColor: "#00ff99",
     borderWidth: 1,
   },
-
   cornerTopLeft: {
     position: "absolute",
     top: 0,
@@ -86,7 +94,6 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: "#00ff99",
   },
-
   cornerTopRight: {
     position: "absolute",
     top: 0,
@@ -95,7 +102,6 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: "#00ff99",
   },
-
   cornerBottomLeft: {
     position: "absolute",
     bottom: 0,
@@ -104,7 +110,6 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: "#00ff99",
   },
-
   cornerBottomRight: {
     position: "absolute",
     bottom: 0,
@@ -113,24 +118,9 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: "#00ff99",
   },
-
-  textOverlay: {
-    position: "absolute",
-    bottom: 100,
-    alignSelf: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    padding: 10,
-    borderRadius: 8,
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
-
-  text: { 
-    color: "white", 
-    fontSize: 16, 
-    textAlign: "center" 
-  },
-
-  center: { 
-    flex: 1, 
-    alignItems: "center", 
-    justifyContent: "center" },
 });
