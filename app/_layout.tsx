@@ -23,9 +23,24 @@ export default function RootLayout() {
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem("apiToken");
       const serverUrl = await AsyncStorage.getItem("serverUrl");
-      setIsAuthenticated(!!token && !!serverUrl);
+
+      if (!token || !serverUrl) {
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${serverUrl}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setIsAuthenticated(res.ok);
+      } catch {
+        setIsAuthenticated(false);
+      }
       setLoading(false);
     };
+
     checkLogin();
   }, []);
 
@@ -39,7 +54,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack initialRouteName={isAuthenticated ? "(tabs)" : "login"}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />
