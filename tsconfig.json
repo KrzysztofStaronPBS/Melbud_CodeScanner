@@ -3,9 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./app/*", "./components/*", "./hooks/*", "./lib/*"]
     }
   },
   "include": [
