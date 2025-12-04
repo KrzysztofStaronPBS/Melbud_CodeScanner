@@ -22,9 +22,10 @@ export default function LoginScreen() {
   const [ip3, setIp3] = useState("");
   const [ip4, setIp4] = useState("");
 
-  const nextInputRef = useRef<TextInput>(null);
-  const nextInputRef2 = useRef<TextInput>(null);
-  const nextInputRef3 = useRef<TextInput>(null);
+  const ip1Ref = useRef<TextInput>(null);
+  const ip2Ref = useRef<TextInput>(null);
+  const ip3Ref = useRef<TextInput>(null);
+  const ip4Ref = useRef<TextInput>(null);
 
   const [port, setPort] = useState("8080");
   const [useDefaultPort, setUseDefaultPort] = useState(true);
@@ -61,11 +62,11 @@ export default function LoginScreen() {
     try {
       const base = buildServerUrl();
 
-      let res = await tryFetch(`https://${base}`);
-      let finalUrl = `https://${base}`;
+      let res = await tryFetch(`http://${base}`);
+      let finalUrl = `http://${base}`;
       if (!res) {
-        res = await tryFetch(`http://${base}`);
-        finalUrl = `http://${base}`;
+        res = await tryFetch(`https://${base}`);
+        finalUrl = `https://${base}`;
       }
 
       if (!res) {
@@ -101,40 +102,43 @@ export default function LoginScreen() {
        <Text style={styles.title}>Wprowadź adres IP serwera Snipe-IT</Text>
         <View style={styles.ipRow}>
           <TextInput
+            ref={ip1Ref}
             style={styles.ipInput}
             keyboardType="numeric"
             maxLength={3}
             value={ip1}
             onChangeText={(val) => {
               setIp1(val);
-              if (val.length === 3) nextInputRef.current?.focus();
+              if (val.length === 3) ip2Ref.current?.focus();
             }}
           />
           <Text style={styles.dot}>.</Text>
           <TextInput
+            ref={ip2Ref}
             style={styles.ipInput}
             keyboardType="numeric"
             maxLength={3}
             value={ip2}
             onChangeText={(val) => {
               setIp2(val);
-              if (val.length === 3) nextInputRef2.current?.focus();
+              if (val.length === 3) ip3Ref.current?.focus();
             }}
           />
           <Text style={styles.dot}>.</Text>
           <TextInput
-            ref={nextInputRef}
+            ref={ip3Ref}
             style={styles.ipInput}
             keyboardType="numeric"
             maxLength={3}
             value={ip3}
             onChangeText={(val) => {
               setIp3(val);
-              if (val.length === 3) nextInputRef3.current?.focus();
+              if (val.length === 3) ip4Ref.current?.focus();
             }}
           />
           <Text style={styles.dot}>.</Text>
           <TextInput
+            ref={ip4Ref}
             style={styles.ipInput}
             keyboardType="numeric"
             maxLength={3}
