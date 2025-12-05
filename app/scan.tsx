@@ -2,7 +2,6 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { api } from "../lib/api";
 
 export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -15,8 +14,7 @@ export default function ScanScreen() {
       navigation.setOptions({
         title: "Zeskanuj kod QR",
       });
-    } catch (_) {
-    }
+    } catch (_) {}
   }, [navigation]);
 
   if (!permission) return <View />;
@@ -41,12 +39,7 @@ export default function ScanScreen() {
       return;
     }
 
-    try {
-      await api.get(`hardware/${id}`);
-      router.push(`/asset/${id}`);
-    } catch (err) {
-      console.warn("Błąd API:", (err as any)?.message || err);
-    }
+    router.push(`/asset/${id}`);
   };
 
   return (
