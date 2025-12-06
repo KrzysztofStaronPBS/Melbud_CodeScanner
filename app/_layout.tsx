@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
@@ -16,7 +16,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     loadInitialTheme();
@@ -25,7 +25,7 @@ export default function RootLayout() {
       const serverUrl = await AsyncStorage.getItem("serverUrl");
 
       if (!token || !serverUrl) {
-        setIsAuthenticated(false);
+        router.replace("/login");
         setLoading(false);
         return;
       }
@@ -34,9 +34,13 @@ export default function RootLayout() {
         const res = await fetch(`${serverUrl}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setIsAuthenticated(res.ok);
+        if (res.ok) {
+          router.replace("/(tabs)");
+        } else {
+          router.replace("/login");
+        }
       } catch {
-        setIsAuthenticated(false);
+        router.replace("/login");
       }
       setLoading(false);
     };
@@ -54,7 +58,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack initialRouteName={isAuthenticated ? "(tabs)" : "login"}>
+      <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />

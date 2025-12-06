@@ -16,7 +16,7 @@ import { useTheme } from "@react-navigation/native";
 export default function SettingsScreen() {
   const router = useRouter();
   const themePref = useThemeStore(); 
-  const [userChoice, setUserChoice] = useState<ThemeChoice>("light"); 
+  const [userChoice, setUserChoice] = useState<ThemeChoice>("system"); 
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
 
@@ -25,6 +25,9 @@ export default function SettingsScreen() {
       if (saved === "light" || saved === "dark" || saved === "system") {
         setUserChoice(saved);
         setTheme(saved);
+      } else {
+        setUserChoice("system");
+        setTheme("system");
       }
     });
   }, []);
