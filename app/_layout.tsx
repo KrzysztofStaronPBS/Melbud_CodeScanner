@@ -6,8 +6,7 @@ import "react-native-reanimated";
 import { loadInitialTheme, useColorScheme } from "@/hooks/theme-store";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { useEffect } from "react";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -15,7 +14,6 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,7 +24,6 @@ export default function RootLayout() {
 
       if (!token || !serverUrl) {
         router.replace("/login");
-        setLoading(false);
         return;
       }
 
@@ -42,19 +39,10 @@ export default function RootLayout() {
       } catch {
         router.replace("/login");
       }
-      setLoading(false);
     };
 
     checkLogin();
   }, []);
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
