@@ -1,10 +1,10 @@
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/theme-store";
-import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Alert, StyleSheet, Text } from "react-native";
+import Toast from "react-native-toast-message";
+import AssetForm from "../../../components/AssetForm";
 import { getAssetById, getCompanies, getLocations, getModels, getStatuses, updateAsset } from "../../../lib/api";
 import { AssetDetails } from "../../../lib/types";
 
@@ -21,9 +21,12 @@ export default function EditAssetScreen() {
   const [modelNumber, setModelNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [mac, setMac] = useState("");
+
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [modelId, setModelId] = useState<number | null>(null);
   const [statusId, setStatusId] = useState<number | null>(null);
+  const [locationId, setLocationId] = useState<number | null>(null);
+
   const [companies, setCompanies] = useState<any[]>([]);
   const [models, setModels] = useState<any[]>([]);
   const [statuses, setStatuses] = useState<any[]>([]);
@@ -86,96 +89,49 @@ export default function EditAssetScreen() {
         model_id: modelId,
         status_id: statusId,
       });
-      Alert.alert("Sukces", "Sprzęt został zaktualizowany", [
-        { text: "OK", onPress: () => router.back() },
-      ]);
+
+      Toast.show({
+        type: "success",
+        text1: "Sukces",
+        text2: "Sprzęt został zmodyfikowany!",
+        position: "top",
+        visibilityTime: 3000,
+        text1Style: { fontSize: 20, fontWeight: "700" },
+        text2Style: { fontSize: 16 },
+      });
+
+    router.replace("/(tabs)"); 
     } catch (err: any) {
-      Alert.alert("Błąd", "Nie udało się zapisać zmian");
+      Toast.show({
+        type: "error",
+        text1: "Błąd",
+        text2: "Nie udało się zapisać zmian",
+        position: "top",
+        visibilityTime: 3000,
+        text1Style: { fontSize: 20, fontWeight: "700" },
+        text2Style: { fontSize: 16 },
+      });
     }
   };
 
   if (!asset) return <Text style={{ color: C.text }}>Ładowanie...</Text>;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.background }} edges={["bottom"]}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={[styles.label, { color: C.text }]}>Nazwa</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
-          value={name}
-          onChangeText={setName}
-        />
-
-        <Text style={[styles.label, { color: C.text }]}>Tag</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
-          value={tag}
-          onChangeText={setTag}
-        />
-
-        <Text style={[styles.label, { color: C.text }]}>Numer modelu</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
-          value={modelNumber}
-          onChangeText={setModelNumber}
-        />
-
-        <Text style={[styles.label, { color: C.text }]}>Opis</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50", height: 80 }]}
-          value={notes}
-          onChangeText={setNotes}
-          multiline
-        />
-
-        <Text style={[styles.label, { color: C.text }]}>MAC</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: C.background, color: C.text, borderColor: C.icon + "50" }]}
-          value={mac}
-          onChangeText={setMac}
-        />
-
-        <Text style={[styles.label, { color: C.text }]}>Firma</Text>
-        <Picker
-          selectedValue={companyId}
-          onValueChange={(val) => setCompanyId(val)}
-          style={{ color: C.text }}
-        >
-          {companies.map((c) => (
-            <Picker.Item key={c.id} label={c.name} value={c.id} />
-          ))}
-        </Picker>
-
-        <Text style={[styles.label, { color: C.text }]}>Model</Text>
-        <Picker
-          selectedValue={modelId}
-          onValueChange={(val) => setModelId(val)}
-          style={{ color: C.text }}
-        >
-          {models.map((m) => (
-            <Picker.Item key={m.id} label={m.name} value={m.id} />
-          ))}
-        </Picker>
-
-        <Text style={[styles.label, { color: C.text }]}>Status</Text>
-        <Picker
-          selectedValue={statusId}
-          onValueChange={(val) => setStatusId(val)}
-          style={{ color: C.text }}
-        >
-          {statuses.map((s) => (
-            <Picker.Item key={s.id} label={s.name} value={s.id} />
-          ))}
-        </Picker>
-
-        <TouchableOpacity
-          style={[styles.saveBtn, { backgroundColor: theme === "dark" ? "#1e88e5" : "#2196f3" }]}
-          onPress={handleSave}
-        >
-          <Text style={styles.saveText}>Zapisz</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+    <AssetForm
+      C={C}
+      name={name} setName={setName}
+      tag={tag} setTag={setTag}
+      modelNumber={modelNumber} setModelNumber={setModelNumber}
+      notes={notes} setNotes={setNotes}
+      mac={mac} setMac={setMac}
+      companyId={companyId} setCompanyId={setCompanyId} companies={companies}
+      modelId={modelId} setModelId={setModelId} models={models}
+      statusId={statusId} setStatusId={setStatusId} statuses={statuses}
+      locationId={locationId} setLocationId={setLocationId} locations={locations}
+      onSubmit={handleSave}
+      submitLabel="Zapisz"
+      submitColor={theme === "dark" ? "#1e88e5" : "#2196f3"}
+    />
   );
 }
 

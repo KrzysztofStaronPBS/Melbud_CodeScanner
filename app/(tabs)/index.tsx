@@ -21,6 +21,8 @@ import { useColorScheme } from "@/hooks/theme-store";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import Toast from "react-native-toast-message";
+
 export default function HomeScreen() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [filtered, setFiltered] = useState<Asset[]>([]);
@@ -82,8 +84,25 @@ export default function HomeScreen() {
             try {
               await deleteAsset(id);
               setAssets((prev) => prev.filter((a) => a.id !== id));
+              Toast.show({
+                type: "success",
+                text1: "Sukces",
+                text2: "Sprzęt został poprawnie usunięty!",
+                position: "top",
+                visibilityTime: 3000,
+                text1Style: { fontSize: 20, fontWeight: "700" },
+                text2Style: { fontSize: 16 },
+              });
             } catch (err: any) {
-              Alert.alert("Błąd", "Nie udało się usunąć przedmiotu.");
+              Toast.show({
+                type: "error",
+                text1: "Błąd",
+                text2: "Nie udało się usunąć sprzętu.",
+                position: "top",
+                visibilityTime: 3000,
+                text1Style: { fontSize: 20, fontWeight: "700" },
+                text2Style: { fontSize: 16 },
+              });
               console.error(err);
             }
           },

@@ -215,7 +215,7 @@ function createStyles(C: any) {
       backgroundColor: C.background,
       color: C.text,
       padding: 12,
-      marginBottom: 96,
+      marginBottom: 60,
       borderRadius: 6,
       borderWidth: 1,
       borderColor: C.icon + "50",
@@ -229,7 +229,7 @@ function createStyles(C: any) {
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 60,
+      marginBottom: 48,
     },
     ipInput: {
       width: 60,
@@ -249,7 +249,7 @@ function createStyles(C: any) {
     },
     portSection: {
     alignItems: "center",
-    marginBottom: 60,
+    marginBottom: 48,
     },
     portInput: {
       width: 100,
