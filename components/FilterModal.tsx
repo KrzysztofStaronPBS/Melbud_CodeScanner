@@ -36,21 +36,21 @@ export default function FilterModal({
           <Text style={styles.modalTitle}>Wybierz filtry</Text>
 
           <Picker selectedValue={selectedCategory} onValueChange={setSelectedCategory}>
-            <Picker.Item label="Kategoria" value={null} />
+            <Picker.Item label="Kategoria" value={null} color="000" />
             {categories.map((c) => (
               <Picker.Item key={c.id} label={c.name} value={c.name} />
             ))}
           </Picker>
 
           <Picker selectedValue={selectedModel} onValueChange={setSelectedModel}>
-            <Picker.Item label="Model" value={null} />
+            <Picker.Item label="Model" value={null} color="000" />
             {models.map((m) => (
               <Picker.Item key={m.id} label={m.name} value={m.name} />
             ))}
           </Picker>
 
           <Picker selectedValue={selectedStatus} onValueChange={setSelectedStatus}>
-            <Picker.Item label="Status" value={null} />
+            <Picker.Item label="Status" value={null} color="000" />
             {statuses.map((s) => (
               <Picker.Item key={s.id} label={s.name} value={s.name} />
             ))}
