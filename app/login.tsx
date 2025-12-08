@@ -175,7 +175,16 @@ export default function LoginScreen() {
           placeholder="Wklej swój klucz API"
           placeholderTextColor={C.icon}
           value={token}
-          onChangeText={setToken}
+          onChangeText={(val) => {
+            const cleaned = val.replace(/[\n\r\t]/g, "").trim();
+            setToken(cleaned);
+          }}
+          multiline={false}
+          numberOfLines={1}
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="done"
+          onSubmitEditing={handleLogin}
         />
 
         <View style={styles.rememberRow}>
@@ -197,7 +206,7 @@ function createStyles(C: any) {
     },
     container: {
       flex: 1,
-      justifyContent: "center",
+      justifyContent: "flex-start",
       padding: 20,
     },
     title: {
@@ -215,7 +224,7 @@ function createStyles(C: any) {
       backgroundColor: C.background,
       color: C.text,
       padding: 12,
-      marginBottom: 60,
+      marginBottom: 36,
       borderRadius: 6,
       borderWidth: 1,
       borderColor: C.icon + "50",
@@ -223,7 +232,7 @@ function createStyles(C: any) {
     rememberRow: {
       flexDirection: "row",
       alignItems: "center",
-      marginBottom: 24,
+      marginBottom: 12,
     },
     ipRow: {
       flexDirection: "row",
