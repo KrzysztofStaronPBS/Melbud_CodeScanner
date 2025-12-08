@@ -8,19 +8,20 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
+import AssetListItem from "../../components/AssetListItem";
+import FilterControls from "../../components/FilterControls";
+import FilterModal from "../../components/FilterModal";
+
 import { useRouter } from "expo-router";
-import AssetItem from "../../components/AssetItem";
-import { deleteAsset, getAssets } from "../../lib/api";
+import { deleteAsset, getAssets, getCategories, getModels, getStatuses } from "../../lib/api";
 import { Asset } from "../../lib/types";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/theme-store";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import Toast from "react-native-toast-message";
 
 export default function HomeScreen() {
@@ -28,10 +29,19 @@ export default function HomeScreen() {
   const [filtered, setFiltered] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
 
   const router = useRouter();
   const theme = useColorScheme() ?? "light";
   const C = Colors[theme];
+
+  const [categories, setCategories] = useState<any[]>([]);
+  const [models, setModels] = useState<any[]>([]);
+  const [statuses, setStatuses] = useState<any[]>([]);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -41,6 +51,7 @@ export default function HomeScreen() {
 
         if (token && serverUrl) {
           await loadAssets();
+          await loadFilters();
         }
       };
       checkAndLoad();
@@ -60,16 +71,34 @@ export default function HomeScreen() {
     }
   }
 
+  async function loadFilters() {
+    try {
+      setCategories(await getCategories());
+      setModels(await getModels());
+      setStatuses(await getStatuses());
+    } catch (err) {
+      console.error("Błąd pobierania filtrów:", err);
+    }
+  }
+
   useEffect(() => {
     const q = query.toLowerCase();
     setFiltered(
-      assets.filter(
-        (a) =>
-          a.name?.toLowerCase().includes(q) ||
-          a.asset_tag?.toLowerCase().includes(q)
-      )
+      assets.filter((a) => {
+        if (
+          !(
+            a.name?.toLowerCase().includes(q) ||
+            a.asset_tag?.toLowerCase().includes(q)
+          )
+        )
+          return false;
+        if (selectedCategory && a.category?.name !== selectedCategory) return false;
+        if (selectedModel && a.model?.name !== selectedModel) return false;
+        if (selectedStatus && a.status_label?.name !== selectedStatus) return false;
+        return true;
+      })
     );
-  }, [query, assets]);
+  }, [query, assets, selectedCategory, selectedModel, selectedStatus]);
 
   const handleDelete = (id: number, name: string) => {
     Alert.alert(
@@ -144,6 +173,16 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        <FilterControls
+          selectedCategory={selectedCategory}
+          selectedModel={selectedModel}
+          selectedStatus={selectedStatus}
+          onClearCategory={() => setSelectedCategory(null)}
+          onClearModel={() => setSelectedModel(null)}
+          onClearStatus={() => setSelectedStatus(null)}
+          onOpenModal={() => setFilterModalVisible(true)}
+        />
+
         {loading ? (
           <Text style={{ color: C.text }}>Pobieram dane...</Text>
         ) : assets.length === 0 ? (
@@ -155,49 +194,36 @@ export default function HomeScreen() {
             onRefresh={loadAssets}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <View
-                style={[
-                  styles.itemRow,
-                  {
-                    backgroundColor: C.background,
-                    borderColor: C.icon + "40",
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  style={{ flex: 1 }}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/asset/[id]",
-                      params: { id: item.id },
-                    })
-                  }
-                >
-                  <AssetItem asset={item} backgroundColor={C.background} textColor={C.text} />
-                </TouchableOpacity>
-
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    style={[styles.btn, styles.edit]}
-                    onPress={() => handleEdit(item.id)}
-                  >
-                    <Text style={styles.btnText}>Edytuj</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.btn, styles.delete]}
-                    onPress={() =>
-                      handleDelete(item.id, item.name ?? "nieznany")
-                    }
-                  >
-                    <Text style={styles.btnText}>Usuń</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <AssetListItem
+                asset={item}
+                backgroundColor={C.background}
+                textColor={C.text}
+                borderColor={C.icon + "40"}
+                onPress={() =>
+                  router.push({ pathname: "/asset/[id]", params: { id: item.id } })
+                }
+                onEdit={() => handleEdit(item.id)}
+                onDelete={() => handleDelete(item.id, item.name ?? "nieznany")}
+              />
             )}
           />
         )}
       </View>
+
+      <FilterModal
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        selectedCategory={selectedCategory}
+        selectedModel={selectedModel}
+        selectedStatus={selectedStatus}
+        setSelectedCategory={setSelectedCategory}
+        setSelectedModel={setSelectedModel}
+        setSelectedStatus={setSelectedStatus}
+        categories={categories}
+        models={models}
+        statuses={statuses}
+      />
+      
     </View>
   );
 }
@@ -231,23 +257,4 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 28,
   },
-  itemRow: {
-    marginHorizontal: 12,
-    marginBottom: 10,
-    borderRadius: 8,
-    padding: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1,
-  },
-  actions: { flexDirection: "row", gap: 6 },
-  btn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  edit: { backgroundColor: "#2196f3" },
-  delete: { backgroundColor: "#f44336" },
-  btnText: { color: "#fff", fontWeight: "600" },
 });

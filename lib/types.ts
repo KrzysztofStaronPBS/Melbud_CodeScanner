@@ -38,12 +38,12 @@ export interface Asset {
   category?: Category;
   asset_tag?: string;
   status_label?: StatusLabel;
+  model?: Model;
 }
 
 export interface AssetDetails extends Asset {
   company?: Company;
   manufacturer?: Manufacturer;
-  model?: Model;
   model_number?: string;
   notes?: string;
   mac_address?: string;

@@ -68,3 +68,11 @@ export async function getLocations() {
 export async function createAsset(payload: any) {
   return authorizedRequest("post", "/hardware", payload);
 }
+
+export async function getAssetByTag(tag: string): Promise<AssetDetails> {
+  return authorizedRequest<AssetDetails>("get", `/hardware/bytag/${encodeURIComponent(tag)}`);
+}
+
+export async function getCategories() {
+  return authorizedRequest<{ rows: any[] }>("get", "/categories").then(r => r.rows);
+}

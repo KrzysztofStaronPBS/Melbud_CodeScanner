@@ -3,7 +3,7 @@ import { useColorScheme } from "@/hooks/theme-store";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { getAssetById } from "../../lib/api";
+import { getAssetById, getAssetByTag } from "../../lib/api";
 import { AssetDetails } from "../../lib/types";
 
 
@@ -17,7 +17,15 @@ export default function AssetDetailsScreen() {
   useEffect(() => {
     async function load() {
       try {
-        const data = await getAssetById(Number(id));
+        let data: AssetDetails;
+        if (/^\d+$/.test(id)) {
+          // jeśli id jest liczbą
+          data = await getAssetById(Number(id));
+        } else {
+          // jeśli id to tag
+          data = await getAssetByTag(id);
+        }
+
         setAsset(data);
         navigation.setOptions({
           title: data.name || data.asset_tag || "Szczegóły",

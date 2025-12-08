@@ -33,13 +33,13 @@ export default function ScanScreen() {
     if (now - lastScanTime.current < 2000) return;
     lastScanTime.current = now;
 
-    const id = data.split("/").pop()?.trim() ?? "";
-    if (!id || isNaN(Number(id))) {
+    const identifier = data.split("/").pop()?.trim() ?? "";
+    if (!identifier) {
       console.warn("Niepoprawny kod QR:", data);
       return;
     }
 
-    router.push(`/asset/${id}`);
+    router.push(`/asset/${identifier}`);
   };
 
   return (
